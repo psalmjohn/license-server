@@ -1,0 +1,6 @@
+{
+  "name": "license-server",
+  "main": "server",
+  "scripts": { "start": "node server" },
+  "dependencies": { "express": "^4.18.2" }
+}
