@@ -2,13 +2,32 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-const validKeys = ['TESTKEY-1234', 'PSALM-VIP-9999'];
+// Ito ang magsisilbing database mo. 
+// Kung 'null' ang hwid, ibig sabihin bago ang account at i-ba-bind sa unang gagamit.
+const database = {
+    '87qTYGFNfl': { hwid: null }, 
+    'PSALM-VIP-9999': { hwid: null }
+};
 
 app.post('/verify', (req, res) => {
-    if (validKeys.includes(req.body.key)) {
-        res.json({ status: 'valid', message: 'Access Granted' });
+    const { key, hwid } = req.body;
+    const account = database[key];
+
+    if (!account) {
+        return res.status(401).json({ status: 'invalid', message: 'Account not found' });
+    }
+
+    // Kung bago ang key at walang naka-link na PC, i-save ang HWID ng user
+    if (account.hwid === null) {
+        account.hwid = hwid;
+        return res.json({ status: 'valid', message: 'Account successfully bound to this PC!' });
+    }
+
+    // Kung may naka-link na PC, i-check kung tugma ito
+    if (account.hwid === hwid) {
+        return res.json({ status: 'valid', message: 'Welcome back! Access Granted.' });
     } else {
-        res.status(401).json({ status: 'invalid', message: 'Access Denied' });
+        return res.status(401).json({ status: 'invalid', message: 'ERROR: This account is registered to another computer!' });
     }
 });
 
