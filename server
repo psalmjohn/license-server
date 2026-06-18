@@ -1,0 +1,15 @@
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+const validKeys = ['TESTKEY-1234', 'PSALM-VIP-9999'];
+
+app.post('/verify', (req, res) => {
+    if (validKeys.includes(req.body.key)) {
+        res.json({ status: 'valid', message: 'Access Granted' });
+    } else {
+        res.status(401).json({ status: 'invalid', message: 'Access Denied' });
+    }
+});
+
+app.listen(process.env.PORT || 3000, () => console.log('Server is running'));
